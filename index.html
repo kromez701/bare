@@ -6407,4 +6407,284 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+
+<script>
+    // Image Slider and Variant Handler
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Image mapping for different color variants
+    const colorImages = {
+        'Blue': {
+            main: '//www.baresculpt.com/cdn/shop/files/1_Large_6ae5e23a-42e8-47e3-b015-6e9d811fcdf1.webp?v=1749719227',
+            thumbnails: [
+                '//www.baresculpt.com/cdn/shop/files/1_Large_6ae5e23a-42e8-47e3-b015-6e9d811fcdf1.webp?v=1749719227',
+                '//www.baresculpt.com/cdn/shop/files/2_Large_627d8f63-f814-4a44-82e0-a57f1dbc2d10.jpg?v=1753799666',
+                '//www.baresculpt.com/cdn/shop/files/5_Large_5543045a-0c45-4de8-8ca4-508901e82046.jpg?v=1753801007'
+            ]
+        },
+        'Green': {
+            main: '//www.baresculpt.com/cdn/shop/files/7_Large_94f29678-78f8-430b-afce-53a84709b381.jpg?v=1753799666',
+            thumbnails: [
+                '//www.baresculpt.com/cdn/shop/files/7_Large_94f29678-78f8-430b-afce-53a84709b381.jpg?v=1753799666',
+                '//www.baresculpt.com/cdn/shop/files/4_Large_d337755e-1252-4991-b040-2b3f2ed36262.jpg?v=1753799666',
+                '//www.baresculpt.com/cdn/shop/files/6_Large_c8e03975-647e-4658-9d69-e281239f99c9.jpg?v=1753801007'
+            ]
+        },
+        'Red': {
+            main: '//www.baresculpt.com/cdn/shop/files/10_Large_9c55d916-2173-453a-8746-6016d027de6f.jpg?v=1753801007',
+            thumbnails: [
+                '//www.baresculpt.com/cdn/shop/files/10_Large_9c55d916-2173-453a-8746-6016d027de6f.jpg?v=1753801007',
+                '//www.baresculpt.com/cdn/shop/files/8_Large_7790bbcd-2481-4ee0-8c22-06e55611bb3b.jpg?v=1753801007',
+                '//www.baresculpt.com/cdn/shop/files/9_Large_a8a6def3-15c7-4958-bba1-77bb893aaa67.jpg?v=1753801007'
+            ]
+        }
+    };
+    
+    let currentImageIndex = 0;
+    let currentColor = 'Blue';
+    
+    // Get main image element
+    const mainImage = document.querySelector('.product__media img');
+    
+    // Get slider elements
+    const thumbnailSlider = document.getElementById('Slider-Thumbnails-template--19132616474781__main');
+    const prevButton = document.querySelector('.slider-button--prev');
+    const nextButton = document.querySelector('.slider-button--next');
+    const thumbnailButtons = document.querySelectorAll('.thumbnail-list__item button');
+    
+    // Function to update main image
+    function updateMainImage(imageSrc, alt = 'Deep Tissue Massage Roller') {
+        if (mainImage) {
+            // Update src and srcset for different screen sizes
+            const baseUrl = imageSrc.split('?')[0];
+            const params = imageSrc.split('?')[1] || 'v=1749719227';
+            
+            mainImage.src = `${baseUrl}?${params}&width=1946`;
+            mainImage.alt = alt;
+            
+            // Update srcset for responsive images
+            const widths = [246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946];
+            const srcset = widths.map(width => `${baseUrl}?${params}&width=${width} ${width}w`).join(', ');
+            mainImage.srcset = srcset;
+        }
+    }
+    
+    // Function to update thumbnail active state
+    function updateThumbnailActiveState(activeIndex) {
+        thumbnailButtons.forEach((button, index) => {
+            if (index === activeIndex) {
+                button.setAttribute('aria-current', 'true');
+                button.classList.add('active');
+            } else {
+                button.removeAttribute('aria-current');
+                button.classList.remove('active');
+            }
+        });
+    }
+    
+    // Function to update thumbnails based on color
+    function updateThumbnailsForColor(color) {
+        const colorData = colorImages[color];
+        if (!colorData) return;
+        
+        thumbnailButtons.forEach((button, index) => {
+            if (index < colorData.thumbnails.length) {
+                const img = button.querySelector('img');
+                if (img) {
+                    const baseUrl = colorData.thumbnails[index].split('?')[0];
+                    const params = colorData.thumbnails[index].split('?')[1] || 'v=1749719227';
+                    
+                    img.src = `${baseUrl}?${params}&width=416`;
+                    
+                    // Update srcset for thumbnails
+                    const widths = [54, 74, 104, 162, 208, 324, 416];
+                    const srcset = widths.map(width => `${baseUrl}?${params}&width=${width} ${width}w`).join(', ');
+                    img.srcset = srcset;
+                }
+                button.style.display = 'block';
+            } else {
+                button.style.display = 'none';
+            }
+        });
+    }
+    
+    // Function to slide thumbnails
+    function slideToPosition(direction) {
+        if (!thumbnailSlider) return;
+        
+        const slideWidth = thumbnailSlider.querySelector('.thumbnail-list__item').offsetWidth;
+        const containerWidth = thumbnailSlider.offsetWidth;
+        const maxSlides = Math.floor(containerWidth / slideWidth);
+        const totalSlides = thumbnailButtons.length;
+        
+        let currentTransform = thumbnailSlider.style.transform;
+        let currentOffset = 0;
+        
+        if (currentTransform) {
+            const match = currentTransform.match(/translateX\((-?\d+(?:\.\d+)?)px\)/);
+            if (match) {
+                currentOffset = parseFloat(match[1]);
+            }
+        }
+        
+        if (direction === 'next') {
+            const newOffset = currentOffset - (slideWidth * 3); // Move 3 slides as per data-step="3"
+            const maxOffset = -((totalSlides - maxSlides) * slideWidth);
+            thumbnailSlider.style.transform = `translateX(${Math.max(newOffset, maxOffset)}px)`;
+        } else if (direction === 'prev') {
+            const newOffset = currentOffset + (slideWidth * 3);
+            thumbnailSlider.style.transform = `translateX(${Math.min(newOffset, 0)}px)`;
+        }
+    }
+    
+    // Function to get currently selected color
+    function getCurrentSelectedColor() {
+        const checkedColorRadio = document.querySelector('input[name="Color"]:checked');
+        return checkedColorRadio ? checkedColorRadio.value : 'Blue';
+    }
+    
+    // Function to update color label
+    function updateColorLabel(color) {
+        const colorLabel = document.getElementById('custom-label-template--19132616474781__main-1');
+        if (colorLabel) {
+            colorLabel.textContent = `Color - ${color}`;
+        }
+    }
+    
+    // Initialize slider with default color
+    function initializeSlider() {
+        currentColor = getCurrentSelectedColor();
+        updateThumbnailsForColor(currentColor);
+        updateMainImage(colorImages[currentColor].main);
+        updateThumbnailActiveState(0);
+        updateColorLabel(currentColor);
+    }
+    
+    // Event listeners for thumbnail clicks
+    thumbnailButtons.forEach((button, index) => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentImageIndex = index;
+            
+            const colorData = colorImages[currentColor];
+            if (colorData && colorData.thumbnails[index]) {
+                updateMainImage(colorData.thumbnails[index]);
+                updateThumbnailActiveState(index);
+            }
+        });
+    });
+    
+    // Event listeners for slider navigation buttons
+    if (prevButton) {
+        prevButton.addEventListener('click', function() {
+            slideToPosition('prev');
+        });
+    }
+    
+    if (nextButton) {
+        nextButton.addEventListener('click', function() {
+            slideToPosition('next');
+        });
+    }
+    
+    // Event listeners for color variant changes
+    document.querySelectorAll('input[name="Color"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const newColor = this.value;
+            currentColor = newColor;
+            currentImageIndex = 0; // Reset to first image when color changes
+            
+            updateThumbnailsForColor(newColor);
+            updateMainImage(colorImages[newColor].main);
+            updateThumbnailActiveState(0);
+            updateColorLabel(newColor);
+            
+            // Reset slider position
+            if (thumbnailSlider) {
+                thumbnailSlider.style.transform = 'translateX(0px)';
+            }
+            
+            console.log(`Color changed to: ${newColor}`);
+        });
+    });
+    
+    // Keyboard navigation support
+    document.addEventListener('keydown', function(e) {
+        if (e.target.closest('.thumbnail-slider')) {
+            if (e.key === 'ArrowLeft' && prevButton) {
+                e.preventDefault();
+                prevButton.click();
+            } else if (e.key === 'ArrowRight' && nextButton) {
+                e.preventDefault();
+                nextButton.click();
+            }
+        }
+    });
+    
+    // Touch/swipe support for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    if (thumbnailSlider) {
+        thumbnailSlider.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        thumbnailSlider.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+    }
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0 && nextButton) {
+                // Swipe left - go to next
+                nextButton.click();
+            } else if (diff < 0 && prevButton) {
+                // Swipe right - go to previous
+                prevButton.click();
+            }
+        }
+    }
+    
+    // Function to preload images for better performance
+    function preloadImages() {
+        Object.values(colorImages).forEach(colorData => {
+            colorData.thumbnails.forEach(imageSrc => {
+                const img = new Image();
+                img.src = imageSrc;
+            });
+        });
+    }
+    
+    // Initialize everything
+    initializeSlider();
+    preloadImages();
+    
+    // Public functions for external access
+    window.sliderGoToImage = function(index) {
+        if (index >= 0 && index < colorImages[currentColor].thumbnails.length) {
+            currentImageIndex = index;
+            updateMainImage(colorImages[currentColor].thumbnails[index]);
+            updateThumbnailActiveState(index);
+        }
+    };
+    
+    window.sliderChangeColor = function(color) {
+        if (colorImages[color]) {
+            const colorRadio = document.querySelector(`input[name="Color"][value="${color}"]`);
+            if (colorRadio) {
+                colorRadio.checked = true;
+                colorRadio.dispatchEvent(new Event('change'));
+            }
+        }
+    };
+    
+    console.log('Image slider and variant handler initialized');
+});
+</script>
 </html>
