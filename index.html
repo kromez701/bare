@@ -6166,4 +6166,197 @@ document.addEventListener('DOMContentLoaded', function() {
 }); 
 
 </script>
+
+<script>
+
+    // Variant Selection and Cart Redirect Handler
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Price configuration for each quantity
+    const priceConfig = {
+        1: { price: '£44.95', comparePrice: '£119.98', savings: '50%' },
+        2: { price: '£79.95', comparePrice: '£239.96', savings: '£119.98' },
+        3: { price: '£99.95', comparePrice: '£359.94', savings: '£179.97' }
+    };
+    
+    // URL configuration for redirects based on quantity and color
+    const redirectUrls = {
+        1: {
+            'Blue': '/checkout/blue-single',
+            'Green': '/checkout/green-single', 
+            'Red': '/checkout/red-single'
+        },
+        2: {
+            'Blue-Blue': '/checkout/blue-blue-pack',
+            'Blue-Green': '/checkout/blue-green-pack',
+            'Blue-Red': '/checkout/blue-red-pack',
+            'Green-Blue': '/checkout/green-blue-pack',
+            'Green-Green': '/checkout/green-green-pack',
+            'Green-Red': '/checkout/green-red-pack',
+            'Red-Blue': '/checkout/red-blue-pack',
+            'Red-Green': '/checkout/red-green-pack',
+            'Red-Red': '/checkout/red-red-pack'
+        },
+        3: {
+            'Blue-Blue-Blue': '/checkout/blue-blue-blue-pack',
+            'Blue-Blue-Green': '/checkout/blue-blue-green-pack',
+            'Blue-Blue-Red': '/checkout/blue-blue-red-pack',
+            'Blue-Green-Blue': '/checkout/blue-green-blue-pack',
+            'Blue-Green-Green': '/checkout/blue-green-green-pack',
+            'Blue-Green-Red': '/checkout/blue-green-red-pack',
+            'Blue-Red-Blue': '/checkout/blue-red-blue-pack',
+            'Blue-Red-Green': '/checkout/blue-red-green-pack',
+            'Blue-Red-Red': '/checkout/blue-red-red-pack',
+            'Green-Blue-Blue': '/checkout/green-blue-blue-pack',
+            'Green-Blue-Green': '/checkout/green-blue-green-pack',
+            'Green-Blue-Red': '/checkout/green-blue-red-pack',
+            'Green-Green-Blue': '/checkout/green-green-blue-pack',
+            'Green-Green-Green': '/checkout/green-green-green-pack',
+            'Green-Green-Red': '/checkout/green-green-red-pack',
+            'Green-Red-Blue': '/checkout/green-red-blue-pack',
+            'Green-Red-Green': '/checkout/green-red-green-pack',
+            'Green-Red-Red': '/checkout/green-red-red-pack',
+            'Red-Blue-Blue': '/checkout/red-blue-blue-pack',
+            'Red-Blue-Green': '/checkout/red-blue-green-pack',
+            'Red-Blue-Red': '/checkout/red-blue-red-pack',
+            'Red-Green-Blue': '/checkout/red-green-blue-pack',
+            'Red-Green-Green': '/checkout/red-green-green-pack',
+            'Red-Green-Red': '/checkout/red-green-red-pack',
+            'Red-Red-Blue': '/checkout/red-red-blue-pack',
+            'Red-Red-Green': '/checkout/red-red-green-pack',
+            'Red-Red-Red': '/checkout/red-red-red-pack'
+        }
+    };
+    
+    // Function to update prices based on selected quantity
+    function updatePrices(quantity) {
+        const config = priceConfig[quantity];
+        if (!config) return;
+        
+        // Update all price elements for the selected quantity break
+        const quantityBreak = document.querySelector(`label[data-quantity="${quantity}"]`);
+        if (quantityBreak) {
+            const priceElement = quantityBreak.querySelector('.quantity-break__price span');
+            const comparePriceElement = quantityBreak.querySelector('.quantity-break__compare-price span');
+            const savingsElement = quantityBreak.querySelector('.quantity-break__caption span');
+            
+            if (priceElement) priceElement.textContent = config.price;
+            if (comparePriceElement) comparePriceElement.textContent = config.comparePrice;
+            if (savingsElement) savingsElement.textContent = config.savings;
+        }
+    }
+    
+    // Function to get selected colors for current quantity
+    function getSelectedColors(quantity) {
+        const colors = [];
+        const quantityBreak = document.querySelector(`label[data-quantity="${quantity}"]`);
+        
+        if (quantityBreak) {
+            const selects = quantityBreak.querySelectorAll('.quantity-break__variant-select');
+            selects.forEach(select => {
+                colors.push(select.value);
+            });
+        }
+        
+        return colors;
+    }
+    
+    // Function to get current selected quantity
+    function getSelectedQuantity() {
+        const checkedRadio = document.querySelector('input[name="quantity"]:checked');
+        return checkedRadio ? parseInt(checkedRadio.value) : 1;
+    }
+    
+    // Function to generate redirect URL
+    function getRedirectUrl() {
+        const quantity = getSelectedQuantity();
+        const colors = getSelectedColors(quantity);
+        const colorKey = colors.join('-');
+        
+        if (redirectUrls[quantity] && redirectUrls[quantity][colorKey]) {
+            return redirectUrls[quantity][colorKey];
+        }
+        
+        // Fallback URL if specific combination not found
+        return `/checkout/pack-${quantity}-${colorKey.toLowerCase()}`;
+    }
+    
+    // Initialize prices on page load
+    Object.keys(priceConfig).forEach(quantity => {
+        updatePrices(parseInt(quantity));
+    });
+    
+    // Event listener for quantity selection changes
+    document.querySelectorAll('input[name="quantity"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const quantity = parseInt(this.value);
+            updatePrices(quantity);
+            
+            // Update button text or styling if needed
+            console.log(`Selected quantity: ${quantity}`);
+        });
+    });
+    
+    // Event listener for variant/color selection changes
+    document.querySelectorAll('.quantity-break__variant-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const quantity = getSelectedQuantity();
+            console.log(`Color changed for quantity ${quantity}:`, getSelectedColors(quantity));
+        });
+    });
+    
+    // Add to cart button redirect functionality
+    const addToCartButton = document.getElementById('ProductSubmitButton-template--19132616474781__main');
+    
+    if (addToCartButton) {
+        addToCartButton.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            // Get the redirect URL based on current selection
+            const redirectUrl = getRedirectUrl();
+            
+            // Optional: Show loading state
+            const spinner = this.querySelector('.loading-overlay__spinner');
+            const label = this.querySelector('.main-atc__label__text');
+            
+            if (spinner) spinner.classList.remove('hidden');
+            if (label) label.textContent = 'Adding...';
+            
+            // Log for debugging
+            console.log('Redirecting to:', redirectUrl);
+            console.log('Selected quantity:', getSelectedQuantity());
+            console.log('Selected colors:', getSelectedColors(getSelectedQuantity()));
+            
+            // Redirect after a short delay to show loading state
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 500);
+        });
+    }
+    
+    // Optional: Function to manually trigger redirect (useful for testing)
+    window.triggerCartRedirect = function() {
+        const redirectUrl = getRedirectUrl();
+        console.log('Manual redirect to:', redirectUrl);
+        window.location.href = redirectUrl;
+    };
+    
+    // Optional: Function to get current selection info (useful for debugging)
+    window.getCurrentSelection = function() {
+        const quantity = getSelectedQuantity();
+        const colors = getSelectedColors(quantity);
+        const redirectUrl = getRedirectUrl();
+        
+        return {
+            quantity: quantity,
+            colors: colors,
+            redirectUrl: redirectUrl,
+            price: priceConfig[quantity]?.price
+        };
+    };
+    
+    console.log('Variant selection and cart redirect handler initialized');
+});
+
+</script>
 </html>
