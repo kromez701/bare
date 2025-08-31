@@ -6708,10 +6708,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    const regularPriceElements = document.querySelectorAll('.price-item--regular.main-price, .price-item--sale.main-price');
-    regularPriceElements.forEach(element => {
-        if (element) element.textContent = '£79.95';
-    });
+   
     
     // Function to update prices based on selected quantity
     function updatePrices(quantity) {
