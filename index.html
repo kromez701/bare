@@ -6154,6 +6154,9 @@ Log in</a><ul class="list list-social list-unstyled" role="list"></ul>
   .icon.icon-hamburger{
     display: none !important;
   }
+  .slider-button.slider-button--next, .slider-button.slider-button--prev{
+    display: none !important;
+  }
   </style>
 </body>
 <script>
@@ -6824,7 +6827,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             e.stopPropagation();
             console.log('Previous button clicked - attempting slide');
-            slideToPosition('prev');
+            // slideToPosition('prev');
         });
         
         // Also try mousedown for more reliable triggering
@@ -6840,7 +6843,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             e.stopPropagation();
             console.log('Next button clicked - attempting slide');
-            slideToPosition('next');
+            // slideToPosition('next');
         });
         
         // Also try mousedown for more reliable triggering
@@ -6854,11 +6857,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.closest('.slider-button--prev')) {
             e.preventDefault();
             console.log('Prev button clicked via document listener');
-            slideToPosition('prev');
+            // slideToPosition('prev');
         } else if (e.target.closest('.slider-button--next')) {
             e.preventDefault();
             console.log('Next button clicked via document listener');
-            slideToPosition('next');
+            // slideToPosition('next');
         }
     });
     
