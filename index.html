@@ -6409,39 +6409,33 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-    // Image Slider and Variant Handler
+  // Image Slider and Variant Handler
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Image mapping for different color variants
-    const colorImages = {
-        'Blue': {
-            main: '//www.baresculpt.com/cdn/shop/files/1_Large_6ae5e23a-42e8-47e3-b015-6e9d811fcdf1.webp?v=1749719227',
-            thumbnails: [
-                '//www.baresculpt.com/cdn/shop/files/1_Large_6ae5e23a-42e8-47e3-b015-6e9d811fcdf1.webp?v=1749719227',
-                '//www.baresculpt.com/cdn/shop/files/2_Large_627d8f63-f814-4a44-82e0-a57f1dbc2d10.jpg?v=1753799666',
-                '//www.baresculpt.com/cdn/shop/files/5_Large_5543045a-0c45-4de8-8ca4-508901e82046.jpg?v=1753801007'
-            ]
-        },
-        'Green': {
-            main: '//www.baresculpt.com/cdn/shop/files/7_Large_94f29678-78f8-430b-afce-53a84709b381.jpg?v=1753799666',
-            thumbnails: [
-                '//www.baresculpt.com/cdn/shop/files/7_Large_94f29678-78f8-430b-afce-53a84709b381.jpg?v=1753799666',
-                '//www.baresculpt.com/cdn/shop/files/4_Large_d337755e-1252-4991-b040-2b3f2ed36262.jpg?v=1753799666',
-                '//www.baresculpt.com/cdn/shop/files/6_Large_c8e03975-647e-4658-9d69-e281239f99c9.jpg?v=1753801007'
-            ]
-        },
-        'Red': {
-            main: '//www.baresculpt.com/cdn/shop/files/10_Large_9c55d916-2173-453a-8746-6016d027de6f.jpg?v=1753801007',
-            thumbnails: [
-                '//www.baresculpt.com/cdn/shop/files/10_Large_9c55d916-2173-453a-8746-6016d027de6f.jpg?v=1753801007',
-                '//www.baresculpt.com/cdn/shop/files/8_Large_7790bbcd-2481-4ee0-8c22-06e55611bb3b.jpg?v=1753801007',
-                '//www.baresculpt.com/cdn/shop/files/9_Large_a8a6def3-15c7-4958-bba1-77bb893aaa67.jpg?v=1753801007'
-            ]
-        }
+    // All available images (keeping all 10 thumbnails visible)
+    const allImages = [
+        '//www.baresculpt.com/cdn/shop/files/1_Large_6ae5e23a-42e8-47e3-b015-6e9d811fcdf1.webp?v=1749719227',
+        '//www.baresculpt.com/cdn/shop/files/2_Large_627d8f63-f814-4a44-82e0-a57f1dbc2d10.jpg?v=1753799666',
+        '//www.baresculpt.com/cdn/shop/files/5_Large_5543045a-0c45-4de8-8ca4-508901e82046.jpg?v=1753801007',
+        '//www.baresculpt.com/cdn/shop/files/7_Large_94f29678-78f8-430b-afce-53a84709b381.jpg?v=1753799666',
+        '//www.baresculpt.com/cdn/shop/files/4_Large_d337755e-1252-4991-b040-2b3f2ed36262.jpg?v=1753799666',
+        '//www.baresculpt.com/cdn/shop/files/6_Large_c8e03975-647e-4658-9d69-e281239f99c9.jpg?v=1753801007',
+        '//www.baresculpt.com/cdn/shop/files/3_Large_4cf9bbb4-076a-47cd-8a11-44db2ea7d13f.jpg?v=1749719227',
+        '//www.baresculpt.com/cdn/shop/files/10_Large_9c55d916-2173-453a-8746-6016d027de6f.jpg?v=1753801007',
+        '//www.baresculpt.com/cdn/shop/files/8_Large_7790bbcd-2481-4ee0-8c22-06e55611bb3b.jpg?v=1753801007',
+        '//www.baresculpt.com/cdn/shop/files/9_Large_a8a6def3-15c7-4958-bba1-77bb893aaa67.jpg?v=1753801007'
+    ];
+    
+    // Color variant main images (corrected mapping)
+    const colorMainImages = {
+        'Blue': '//www.baresculpt.com/cdn/shop/files/1_Large_6ae5e23a-42e8-47e3-b015-6e9d811fcdf1.webp?v=1749719227',
+        'Green': '//www.baresculpt.com/cdn/shop/files/7_Large_94f29678-78f8-430b-afce-53a84709b381.jpg?v=1753799666', 
+        'Red': '//www.baresculpt.com/cdn/shop/files/10_Large_9c55d916-2173-453a-8746-6016d027de6f.jpg?v=1753801007'
     };
     
     let currentImageIndex = 0;
     let currentColor = 'Blue';
+    let currentSlidePosition = 0;
     
     // Get main image element
     const mainImage = document.querySelector('.product__media img');
@@ -6482,59 +6476,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Function to update thumbnails based on color
+    // Function to update thumbnails - keep all visible, don't hide any
     function updateThumbnailsForColor(color) {
-        const colorData = colorImages[color];
-        if (!colorData) return;
-        
-        thumbnailButtons.forEach((button, index) => {
-            if (index < colorData.thumbnails.length) {
-                const img = button.querySelector('img');
-                if (img) {
-                    const baseUrl = colorData.thumbnails[index].split('?')[0];
-                    const params = colorData.thumbnails[index].split('?')[1] || 'v=1749719227';
-                    
-                    img.src = `${baseUrl}?${params}&width=416`;
-                    
-                    // Update srcset for thumbnails
-                    const widths = [54, 74, 104, 162, 208, 324, 416];
-                    const srcset = widths.map(width => `${baseUrl}?${params}&width=${width} ${width}w`).join(', ');
-                    img.srcset = srcset;
-                }
-                button.style.display = 'block';
-            } else {
-                button.style.display = 'none';
-            }
-        });
+        // Don't hide any thumbnails - keep all 10 visible
+        // The thumbnails represent all product images, not color-specific ones
+        // Just update the main image when color changes
+        console.log(`Color changed to ${color}, keeping all thumbnails visible`);
     }
     
-    // Function to slide thumbnails
+    // Function to slide thumbnails with proper calculation
     function slideToPosition(direction) {
         if (!thumbnailSlider) return;
         
-        const slideWidth = thumbnailSlider.querySelector('.thumbnail-list__item').offsetWidth;
-        const containerWidth = thumbnailSlider.offsetWidth;
-        const maxSlides = Math.floor(containerWidth / slideWidth);
-        const totalSlides = thumbnailButtons.length;
-        
-        let currentTransform = thumbnailSlider.style.transform;
-        let currentOffset = 0;
-        
-        if (currentTransform) {
-            const match = currentTransform.match(/translateX\((-?\d+(?:\.\d+)?)px\)/);
-            if (match) {
-                currentOffset = parseFloat(match[1]);
-            }
-        }
+        const thumbnailItems = thumbnailSlider.querySelectorAll('.thumbnail-list__item');
+        const itemWidth = thumbnailItems[0].offsetWidth + 10; // Add margin
+        const containerWidth = thumbnailSlider.parentElement.offsetWidth;
+        const visibleItems = Math.floor(containerWidth / itemWidth);
+        const totalItems = thumbnailItems.length;
+        const maxPosition = Math.max(0, totalItems - visibleItems);
         
         if (direction === 'next') {
-            const newOffset = currentOffset - (slideWidth * 3); // Move 3 slides as per data-step="3"
-            const maxOffset = -((totalSlides - maxSlides) * slideWidth);
-            thumbnailSlider.style.transform = `translateX(${Math.max(newOffset, maxOffset)}px)`;
+            currentSlidePosition = Math.min(currentSlidePosition + 3, maxPosition);
         } else if (direction === 'prev') {
-            const newOffset = currentOffset + (slideWidth * 3);
-            thumbnailSlider.style.transform = `translateX(${Math.min(newOffset, 0)}px)`;
+            currentSlidePosition = Math.max(currentSlidePosition - 3, 0);
         }
+        
+        const translateX = -(currentSlidePosition * itemWidth);
+        thumbnailSlider.style.transform = `translateX(${translateX}px)`;
+        thumbnailSlider.style.transition = 'transform 0.3s ease';
+        
+        console.log(`Slider moved to position: ${currentSlidePosition}`);
     }
     
     // Function to get currently selected color
@@ -6555,9 +6526,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeSlider() {
         currentColor = getCurrentSelectedColor();
         updateThumbnailsForColor(currentColor);
-        updateMainImage(colorImages[currentColor].main);
+        updateMainImage(colorMainImages[currentColor]);
         updateThumbnailActiveState(0);
         updateColorLabel(currentColor);
+        
+        // Reset slider position
+        currentSlidePosition = 0;
+        if (thumbnailSlider) {
+            thumbnailSlider.style.transform = 'translateX(0px)';
+        }
     }
     
     // Event listeners for thumbnail clicks
@@ -6566,9 +6543,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             currentImageIndex = index;
             
-            const colorData = colorImages[currentColor];
-            if (colorData && colorData.thumbnails[index]) {
-                updateMainImage(colorData.thumbnails[index]);
+            // Use the corresponding image from allImages array
+            if (allImages[index]) {
+                updateMainImage(allImages[index]);
                 updateThumbnailActiveState(index);
             }
         });
@@ -6592,18 +6569,12 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', function() {
             const newColor = this.value;
             currentColor = newColor;
-            currentImageIndex = 0; // Reset to first image when color changes
             
-            updateThumbnailsForColor(newColor);
-            updateMainImage(colorImages[newColor].main);
-            updateThumbnailActiveState(0);
+            // Update main image to the color-specific main image
+            updateMainImage(colorMainImages[newColor]);
             updateColorLabel(newColor);
             
-            // Reset slider position
-            if (thumbnailSlider) {
-                thumbnailSlider.style.transform = 'translateX(0px)';
-            }
-            
+            // Keep current thumbnail selection and position
             console.log(`Color changed to: ${newColor}`);
         });
     });
@@ -6653,11 +6624,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to preload images for better performance
     function preloadImages() {
-        Object.values(colorImages).forEach(colorData => {
-            colorData.thumbnails.forEach(imageSrc => {
-                const img = new Image();
-                img.src = imageSrc;
-            });
+        allImages.forEach(imageSrc => {
+            const img = new Image();
+            img.src = imageSrc;
         });
     }
     
@@ -6667,15 +6636,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Public functions for external access
     window.sliderGoToImage = function(index) {
-        if (index >= 0 && index < colorImages[currentColor].thumbnails.length) {
+        if (index >= 0 && index < allImages.length) {
             currentImageIndex = index;
-            updateMainImage(colorImages[currentColor].thumbnails[index]);
+            updateMainImage(allImages[index]);
             updateThumbnailActiveState(index);
         }
     };
     
     window.sliderChangeColor = function(color) {
-        if (colorImages[color]) {
+        if (colorMainImages[color]) {
             const colorRadio = document.querySelector(`input[name="Color"][value="${color}"]`);
             if (colorRadio) {
                 colorRadio.checked = true;
@@ -6685,6 +6654,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     console.log('Image slider and variant handler initialized');
-});
+});  
 </script>
 </html>
