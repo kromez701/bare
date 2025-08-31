@@ -6778,6 +6778,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function getSelectedQuantity() {
         const checkedRadio = document.querySelector('input[name="quantity"]:checked');
         return checkedRadio ? parseInt(checkedRadio.value) : 2; // Default to quantity 2 for £79.99
+        console.log("checked radio",checkedRadio)
     }
     
     // Function to generate redirect URL
