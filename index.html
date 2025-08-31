@@ -6876,6 +6876,9 @@ document.addEventListener('DOMContentLoaded', function() {
             price: priceConfig[quantity]?.price
         };
     };
+    document.addEventListener("DOMContentLoaded", () => {
+        getSelectedQuantity()
+    })
     
     console.log('Variant selection and cart redirect handler initialized');
 });
