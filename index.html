@@ -6707,6 +6707,11 @@ document.addEventListener('DOMContentLoaded', function() {
             'Red-Red-Red': 'https://n2kzpa-uw.myshopify.com/cart/52331234885965:1'
         }
     };
+
+    const regularPriceElements = document.querySelectorAll('.price-item--regular.main-price, .price-item--sale.main-price');
+    regularPriceElements.forEach(element => {
+        if (element) element.textContent = '£79.95';
+    });
     
     // Function to update prices based on selected quantity
     function updatePrices(quantity) {
