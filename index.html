@@ -2611,13 +2611,13 @@ Log in</a><ul class="list list-social list-unstyled" role="list"></ul>
   <div class="price__container"><div class="price__regular">
       <span class="visually-hidden visually-hidden--inline">Regular price</span>
       <span class="price-item price-item--regular main-price accent-color-accent-1">
-        $59.99
+        $79.95
       </span>
     </div>
     <div class="price__sale ">
       <span class="visually-hidden visually-hidden--inline compare-price-label">Regular price</span>
       <span class="price-item price-item--sale price-item--last main-price accent-color-accent-1">
-        $59.99
+        $79.95
       </span>
         <span class="visually-hidden visually-hidden--inline regular-price-label">Sale price</span>
         <span class="price__compare-price">
@@ -6780,7 +6780,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function getSelectedQuantity() {
         const checkedRadio = document.querySelector('input[name="quantity"]:checked');
         return checkedRadio ? parseInt(checkedRadio.value) : 2; // Default to quantity 2 for £79.99
-        console.log("checked radio",checkedRadio)
+    
     }
     
     // Function to generate redirect URL
@@ -6798,19 +6798,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Set default quantity to 2 and initialize prices
+    // const defaultQuantityRadio = document.querySelector('input[name="quantity"][value="2"]');
+    // if (defaultQuantityRadio) {
+    //     defaultQuantityRadio.checked = true;
+    // }
+    
+    // Initialize with default quantity (2) to show £79.99
+    // const defaultQuantity = getSelectedQuantity();
+    // updatePrices(defaultQuantity);
+    
+    // Initialize prices for all quantity options
+    // Object.keys(priceConfig).forEach(quantity => {
+    //     updatePrices(parseInt(quantity));
+    // });
+
+
+    setTimeout(() => {
     const defaultQuantityRadio = document.querySelector('input[name="quantity"][value="2"]');
     if (defaultQuantityRadio) {
         defaultQuantityRadio.checked = true;
+        // Trigger change event to update prices
+        const changeEvent = new Event('change', { bubbles: true });
+        defaultQuantityRadio.dispatchEvent(changeEvent);
     }
     
-    // Initialize with default quantity (2) to show £79.99
-    const defaultQuantity = getSelectedQuantity();
-    updatePrices(defaultQuantity);
-    
-    // Initialize prices for all quantity options
-    Object.keys(priceConfig).forEach(quantity => {
-        updatePrices(parseInt(quantity));
-    });
+    // Force update with quantity 2 price
+    updatePrices(2);
+}, 100);
+
+// Also update immediately in case elements are already available
+const immediateDefault = document.querySelector('input[name="quantity"][value="2"]');
+if (immediateDefault) {
+    immediateDefault.checked = true;
+}
+updatePrices(2);
     
     // Event listener for quantity selection changes
     document.querySelectorAll('input[name="quantity"]').forEach(radio => {
@@ -6879,9 +6900,7 @@ document.addEventListener('DOMContentLoaded', function() {
             price: priceConfig[quantity]?.price
         };
     };
-    document.addEventListener("DOMContentLoaded", () => {
-        getSelectedQuantity()
-    })
+   
      getSelectedQuantity()
     
     console.log('Variant selection and cart redirect handler initialized');
