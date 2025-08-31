@@ -760,6 +760,22 @@ jdgm.loadJS(jdgm.CDN_HOST+"loader.js"))}))}(document);
   data-shs="true"
   data-shs-beacon="true"
 ></script>
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1497972024708962');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1497972024708962&ev=PageView&noscript=1"
+/></noscript>
+
 </head>
 
   <body class="gradient link-btns--arrow action-btns--center">
@@ -6244,6 +6260,39 @@ document.addEventListener('DOMContentLoaded', function() {
             if (comparePriceElement) comparePriceElement.textContent = config.comparePrice;
             if (savingsElement) savingsElement.textContent = config.savings;
         }
+        
+        // Update main product price display
+        updateMainPrice(config);
+    }
+    
+    // Function to update the main product price section
+    function updateMainPrice(config) {
+        // Update main regular price (both instances)
+        const regularPriceElements = document.querySelectorAll('.price-item--regular.main-price, .price-item--sale.main-price');
+        regularPriceElements.forEach(element => {
+            if (element) element.textContent = config.price;
+        });
+        
+        // Update compare price (crossed out price)
+        const comparePriceElement = document.querySelector('.main-comapre-price');
+        if (comparePriceElement) {
+            comparePriceElement.textContent = config.comparePrice;
+        }
+        
+        // Update savings badge
+        const savingsBadge = document.querySelector('.badge.price__badge-sale .nowrap');
+        if (savingsBadge) {
+            // Calculate savings percentage or use fixed text based on config
+            if (config.savings.includes('%')) {
+                savingsBadge.textContent = `SAVE ${config.savings}`;
+            } else {
+                // For fixed amount savings, calculate percentage
+                const priceNum = parseFloat(config.price.replace('£', ''));
+                const compareNum = parseFloat(config.comparePrice.replace('£', ''));
+                const percentage = Math.round(((compareNum - priceNum) / compareNum) * 100);
+                savingsBadge.textContent = `SAVE ${percentage}%`;
+            }
+        }
     }
     
     // Function to get selected colors for current quantity
@@ -6318,6 +6367,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Optional: Show loading state
             const spinner = this.querySelector('.loading-overlay__spinner');
             const label = this.querySelector('.main-atc__label__text');
+            const originalText = label ? label.textContent : 'Add to cart';
             
             if (spinner) spinner.classList.remove('hidden');
             if (label) label.textContent = 'Adding...';
@@ -6327,10 +6377,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Selected quantity:', getSelectedQuantity());
             console.log('Selected colors:', getSelectedColors(getSelectedQuantity()));
             
-            // Redirect after a short delay to show loading state
-            setTimeout(() => {
-                window.location.href = redirectUrl;
-            }, 500);
+            // Redirect immediately (remove the delay that was causing the loading state to stick)
+            window.location.href = redirectUrl;
         });
     }
     
